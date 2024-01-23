@@ -55,7 +55,7 @@ const posts = [
         "media": "https://unsplash.it/600/400?image=24",
         "author": {
             "name": "Luca Formicola",
-            "image": "https://unsplash.it/600/400?image=534"
+            "image": null
         },
         "likes": 56,
         "created": "2021-04-03"
@@ -75,18 +75,32 @@ const posts = [
 
 const risultatoHtml = document.getElementById("container");
 
+function getInitials(name) {
+    return name.split(' ').map(word => word[0]).join('').toUpperCase();
+}
+
 
 for(let i = 0; i < posts.length; i++){
+    let dataLocale = new Date(posts[i].created)
+    let profilePicHTML = '';
+
+    if(posts[i].author.image == null){
+        const initials = getInitials(posts[i].author.name);
+        profilePicHTML = profilePicHTML = `<div class="profile-pic-default">${initials}</div>`;
+    }else{
+        profilePicHTML = `<img class="profile-pic" src="${posts[i].author.image}" alt="${posts[i].author.name}">`;
+    }
+
     risultatoHtml.innerHTML+= `
     <div class= "post">
         <div class="post__header">
             <div class="post-meta">                    
                 <div class="post-meta__icon">
-                    <img class="profile-pic" src="${posts[i].author.image}" alt="${posts[i].author.name}">                    
+                    ${profilePicHTML}       
                 </div>
                 <div class="post-meta__data">
                     <div class="post-meta__author">${posts[i].author.name}</div>
-                    <div class="post-meta__time">${posts[i].created}</div>
+                    <div class="post-meta__time">${dataLocale.toLocaleDateString()}</div>
                 </div>                    
             </div>
         </div>
@@ -111,10 +125,10 @@ for(let i = 0; i < posts.length; i++){
     `
 };
 
-function updateLikes(postId) {
+function updateLikes(postId, increment) {
     for (let i = 0; i < posts.length; i++) {
         if (posts[i].id === parseInt(postId)) {
-            posts[i].likes++;
+            posts[i].likes += increment;
 
             const likeCounter = document.getElementById(`like-counter-${postId}`);
             if (likeCounter) {
@@ -131,13 +145,23 @@ const arrayID = []
 likeButton.forEach( button => {
     button.addEventListener("click", function(event){
         event.preventDefault();
-        button.classList.add("like-button--liked")
+        
 
         const postId = button.getAttribute('data-postid');
-        arrayID.push(postId)
-        console.log(arrayID)
         
-        updateLikes(postId);
+
+        if (arrayID.includes(postId)) {
+            
+            arrayID.splice(arrayID.indexOf(postId), 1);
+            button.classList.remove("like-button--liked") 
+            updateLikes(postId, -1); 
+
+        } else {
+           
+            arrayID.push(postId);
+            button.classList.add("like-button--liked"); 
+            updateLikes(postId, 1);
+        }
     });
 });
 
