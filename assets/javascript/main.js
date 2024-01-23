@@ -1,4 +1,4 @@
-/*Descrizione
+/*DarrayIDescrizione
 Ricreiamo un feed social aggiungendo al layout di base fornito, il nostro script JS in cui:
 Milestone 1 - Creiamo il nostro array di oggetti che rappresentano ciascun post.
 Ogni post dovrà avere le informazioni necessarie per stampare la relativa card:
@@ -55,7 +55,7 @@ const posts = [
         "media": "https://unsplash.it/600/400?image=24",
         "author": {
             "name": "Luca Formicola",
-            "image": null
+            "image": "https://unsplash.it/600/400?image=534"
         },
         "likes": 56,
         "created": "2021-04-03"
@@ -74,7 +74,7 @@ const posts = [
 ];
 
 const risultatoHtml = document.getElementById("container");
-const likeButton = document.querySelectorAll(".like-button")
+
 
 for(let i = 0; i < posts.length; i++){
     risultatoHtml.innerHTML+= `
@@ -97,13 +97,13 @@ for(let i = 0; i < posts.length; i++){
         <div class="post__footer">
             <div class="likes js-likes">
                 <div class="likes__cta">
-                    <a class="like-button  js-like-button" href="#" data-postid="${posts[i].id}">
+                    <a class="like-button  js-like-button" href="#like-counter-${posts[i].id}" data-postid="${posts[i].id}">
                         <i class="like-button__icon fas fa-thumbs-up" aria-hidden="true"></i>
                         <span class="like-button__label">Mi Piace</span>
                     </a>
                 </div>
                 <div class="likes__counter">
-                    Piace a <b id="like-counter-1" class="js-likes-counter">${posts[i].likes}</b> persone
+                    Piace a <b id="like-counter-${posts[i].id}" class="js-likes-counter">${posts[i].likes}</b> persone
                 </div>
             </div> 
         </div>            
@@ -111,16 +111,33 @@ for(let i = 0; i < posts.length; i++){
     `
 };
 
+function updateLikes(postId) {
+    for (let i = 0; i < posts.length; i++) {
+        if (posts[i].id === parseInt(postId)) {
+            posts[i].likes++;
+
+            const likeCounter = document.getElementById(`like-counter-${postId}`);
+            if (likeCounter) {
+                likeCounter.textContent = posts[i].likes;
+            }
+        }
+    }
+}
+
+const likeButton = document.querySelectorAll(".js-like-button")
+
+
 const arrayID = []
-likeButton.forEach(button => {
-    button.addEventListener("click", function(){
-        button.style.color = "#4764A8";
+likeButton.forEach( button => {
+    button.addEventListener("click", function(event){
+        event.preventDefault();
+        button.classList.add("like-button--liked")
 
         const postId = button.getAttribute('data-postid');
-        console.log("Il pulsante like è stato cliccato per il post con ID:", postId);
         arrayID.push(postId)
-
-    
+        console.log(arrayID)
+        
+        updateLikes(postId);
     });
 });
 
